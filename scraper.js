@@ -4,14 +4,14 @@ var request = require('request');
 var cheerio = require('cheerio');
 var csvWriter = require('csv-write-stream');
 
-request.get('http://substack.net/images/', function(error, response) {
-  if (error) {
-    return console.error('failed: ' + error);
+// GET REQUEST TO 
+request('http://substack.net/images/', function (error, response, body) {
+  if (!error && response.statusCode == 200) {
+    generateContent(body, writeToFile);
   }
-  generateContentArray(response.body, writeToFile);
 });
 
-function generateContentArray(body, callback) {
+function generateContent(body, callback) {
   $ = cheerio.load(body);
   var permissions = [], absoluteUrls = [], fileTypes = [], populatedArr = [];
 
@@ -26,7 +26,7 @@ function generateContentArray(body, callback) {
       populatedArr.push([permissions[i], '.' + fileTypes[i], absoluteUrls[i]]);
     }
   }
-
+  console.log(populatedArr);
   callback('./images.csv', populatedArr, fileWritten);
 }
 
